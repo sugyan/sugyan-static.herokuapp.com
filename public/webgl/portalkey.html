@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title></title>
+    <script type="text/javascript" src="/js/lib/gl-matrix-min.js"></script>
+    <script type="text/javascript" src="./script.js"></script>
+    <script type="x-shader/x-vertex" id="vs">
+      attribute vec3 position;
+      attribute vec2 texCoord;
+      uniform   mat4 pMatrix;
+      uniform   mat4 mvMatrix;
+      varying   vec2 vTexCoord;
+
+      void main() {
+          vTexCoord = texCoord;
+          gl_Position = pMatrix * mvMatrix * vec4(position, 1.0);
+      }
+    </script>
+    <script type="x-shader/x-fragment" id="fs">
+      precision mediump float;
+      uniform sampler2D texture;
+      varying vec2      vTexCoord;
+
+      void main() {
+          gl_FragColor = vec4(vec3(0.0), 1.0) + texture2D(texture, vTexCoord);
+      }
+    </script>
+  </head>
+  <body>
+    <canvas id="canvas"></canvas>
+  </body>
+</html>
