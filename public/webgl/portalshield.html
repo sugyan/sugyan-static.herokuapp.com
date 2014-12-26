@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>WebGL Portal Shield</title>
+    <script type="text/javascript" src="/js/lib/gl-matrix-min.js"></script>
+    <script type="text/javascript" src="./portalShield.js"></script>
+    <script type="x-shader/x-vertex" id="vs-0">
+      attribute vec3 a_position;
+      attribute vec2 a_texCoord;
+      uniform   mat4 u_pMatrix;
+      uniform   mat4 u_mvMatrix;
+      varying   vec2 v_texCoord;
+
+      void main() {
+          v_texCoord = a_texCoord;
+          gl_Position = u_pMatrix * u_mvMatrix * vec4(a_position, 1.0);
+      }
+    </script>
+    <script type="x-shader/x-fragment" id="fs-0">
+      precision mediump float;
+
+      uniform sampler2D u_texture;
+      varying vec2      v_texCoord;
+
+      void main() {
+          gl_FragColor = vec4(vec3(0.1), 1.0) + texture2D(u_texture, v_texCoord);
+      }
+    </script>
+    <script type="x-shader/x-vertex" id="vs-1">
+      attribute vec3  a_position;
+      attribute vec2  a_texCoord;
+      uniform   mat4  u_pMatrix;
+      uniform   mat4  u_mvMatrix;
+      uniform   float u_elapsedTime;
+      varying   vec2  v_texCoord;
+      varying   vec4  v_texCoord0And1;
+
+      void main() {
+          v_texCoord = a_texCoord;
+          v_texCoord0And1 =  vec4(a_texCoord, a_texCoord * 1.35);
+          v_texCoord0And1 += vec4(0, u_elapsedTime * 0.6, u_elapsedTime * 0.6, u_elapsedTime * 0.45);
+          gl_Position = u_pMatrix * u_mvMatrix * vec4(a_position, 1.0);
+      }
+    </script>
+    <script type="x-shader/x-fragment" id="fs-1">
+      precision mediump float;
+
+      uniform sampler2D u_texture;
+      varying vec2      v_texCoord;
+      varying vec4      v_texCoord0And1;
+
+      void main() {
+          vec4  base       = texture2D(u_texture, v_texCoord0And1.xy);
+          vec4  scrolled   = texture2D(u_texture, v_texCoord0And1.zw * 1.35);
+          float blend_mask = ((base.g * scrolled.g) + (base.r * scrolled.r)) * 2.0;
+          vec4  colorTint  = mix(vec4(vec3(0.5, 0.0, 0.5), 1.0), vec4(vec3(0.5), 1.0), blend_mask - 0.25);
+          gl_FragColor   = colorTint + vec4(blend_mask) - vec4(1.0);
+          gl_FragColor.a = 0.5;
+      }
+    </script>
+  </head>
+  <body>
+    <h1>Portal Shield</h1>
+    <canvas id="canvas"></canvas>
+    <p><a href="./portalkey.html">Portal Key</a></p>
+  </body>
+</html>
