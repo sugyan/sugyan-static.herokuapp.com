@@ -428,7 +428,7 @@ $(function () {
         width: "100%",
         height: "100%"
     }).get(0);
-    c.width  = $(c).width();
+    c.width  = $(c).width() * 2;
     c.height = c.width * 3 / 4;
     var iiv = new IIV(c);
 
