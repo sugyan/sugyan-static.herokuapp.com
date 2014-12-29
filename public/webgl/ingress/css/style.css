@@ -4,3 +4,7 @@ body {
     background-color: black;
     font-family: 'Coda', cursive;
 }
+
+.navbar-fixed-top .navbar-collapse, .navbar-fixed-bottom .navbar-collapse {
+    max-height: none;
+}

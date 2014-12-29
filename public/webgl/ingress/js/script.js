@@ -3,32 +3,6 @@ var IIV = function (c) {
     var gl = this.gl = c.getContext("webgl") || c.getContext("experimental-webgl");
     gl.depthFunc(gl.LEQUAL);
     gl.enable(gl.DEPTH_TEST);
-    this.resourceData = {
-        "Portal Shield": {
-            "vertices": ["./data/json/shieldResource.json", "./data/json/shieldResourceXM.json"],
-            "textures": ["./data/img/genericModTexture.png", "./data/img/objectXMTexture.png"],
-            "shaders": [
-                {
-                    vertex: "./shaders/textured.vert",
-                    fragment: "./shaders/textured.frag"
-                },
-                {
-                    vertex: "./shaders/xm.vert",
-                    fragment: "./shaders/xm.frag"
-                }
-            ]
-        },
-        "Portal Key": {
-            "vertices": ["./data/json/portalKeyResourceUnit.json"],
-            "textures": ["./data/img/genericModTexture.png"],
-            "shaders": [
-                {
-                    vertex: "./shaders/textured.vert",
-                    fragment: "./shaders/textured.frag"
-                }
-            ]
-        }
-    };
 };
 IIV.prototype.setup = function (name, callback) {
     var self = this;
@@ -41,6 +15,7 @@ IIV.prototype.setup = function (name, callback) {
         if (! (data["vertices"] && data["textures"] && data["programs"])) {
             return;
         };
+        data.extra = resources["extra"];
         self.data = data;
         callback();
     };
@@ -81,7 +56,7 @@ IIV.prototype.draw = function (time) {
     var mv_mat = mat4.create();
     mat4.perspective(p_mat, 45, this.c.width / this.c.height, 1, 10);
     mat4.translate(p_mat, p_mat, [0.0, 0.0, -3.0]);
-    mat4.rotate(mv_mat, mv_mat, Math.PI * 20.0 / 180.0, [1.0, 0.0, 0.0]);
+    mat4.rotate(mv_mat, mv_mat, Math.PI * 25.0 / 180.0, [1.0, 0.0, 0.0]);
     mat4.rotate(mv_mat, mv_mat, rad, [0.0, 1.0, 0.0]);
     mat4.scale(mv_mat, mv_mat, [2.0, 2.0, 2.0]);
 
@@ -94,11 +69,16 @@ IIV.prototype.draw = function (time) {
             gl.getAttribLocation(this.data["programs"][i], "a_position"),
             gl.getAttribLocation(this.data["programs"][i], "a_texCoord")
         ];
+        var teamColor = [1.0, 0.7, 1.0, 1.0];
+        if (this.data["extra"] && this.data["extra"]["team_color"]) {
+            teamColor = this.data["extra"]["team_color"];
+        }
         // uniform
         gl.useProgram(this.data["programs"][i]);
         gl.uniformMatrix4fv(gl.getUniformLocation(this.data["programs"][i], "u_pMatrix"),  false, p_mat);
         gl.uniformMatrix4fv(gl.getUniformLocation(this.data["programs"][i], "u_mvMatrix"), false, mv_mat);
         gl.uniform1f(gl.getUniformLocation(this.data["programs"][i], "u_elapsedTime"), time / 6000);
+        gl.uniform4fv(gl.getUniformLocation(this.data["programs"][i], "u_teamColor"), teamColor);
         // vbo
         vbuf = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, vbuf);
@@ -219,7 +199,230 @@ IIV.prototype.createPrograms = function (shaders) {
         return program;
     });
 };
-
+IIV.prototype.resourceData = {
+    "Capsule": {
+        "vertices": ["./data/json/capsuleResource.json", "./data/json/capsuleResourceXM.json"],
+        "textures": ["./data/img/genericModTexture.png", "./data/img/objectXMTexture.png"],
+        "shaders": [
+            {
+                "vertex": "./shaders/textured.vert",
+                "fragment": "./shaders/textured.frag"
+            },
+            {
+                "vertex": "./shaders/xm.vert",
+                "fragment": "./shaders/xm.frag"
+            }
+        ]
+    },
+    "Media": {
+        "vertices": ["./data/json/mediaCubeResourceUnit.json"],
+        "textures": ["./data/img/genericModTexture.png"],
+        "shaders": [
+            {
+                "vertex": "./shaders/textured.vert",
+                "fragment": "./shaders/textured.frag"
+            }
+        ]
+    },
+    "Portal Shield": {
+        "vertices": ["./data/json/shieldResource.json", "./data/json/shieldResourceXM.json"],
+        "textures": ["./data/img/genericModTexture.png", "./data/img/objectXMTexture.png"],
+        "shaders": [
+            {
+                "vertex": "./shaders/textured.vert",
+                "fragment": "./shaders/textured.frag"
+            },
+            {
+                "vertex": "./shaders/xm.vert",
+                "fragment": "./shaders/xm.frag"
+            }
+        ]
+    },
+    "AXA Shield": {
+        "vertices": ["./data/json/extra_shield.json", "./data/json/shieldResourceXM.json"],
+        "textures": ["./data/img/genericModTexture.png", "./data/img/objectXMTexture.png"],
+        "shaders": [
+            {
+                "vertex": "./shaders/textured.vert",
+                "fragment": "./shaders/textured.frag"
+            },
+            {
+                "vertex": "./shaders/xm.vert",
+                "fragment": "./shaders/xm.frag"
+            }
+        ]
+    },
+    "Link Amp": {
+        "vertices": ["./data/json/linkAmpResource.json", "./data/json/linkAmpResourceXM.json"],
+        "textures": ["./data/img/genericModTexture.png", "./data/img/objectXMTexture.png"],
+        "shaders": [
+            {
+                "vertex": "./shaders/textured.vert",
+                "fragment": "./shaders/textured.frag"
+            },
+            {
+                "vertex": "./shaders/xm.vert",
+                "fragment": "./shaders/xm.frag"
+            }
+        ]
+    },
+    "Heat Sink": {
+        "vertices": ["./data/json/heatSinkResource.json", "./data/json/heatSinkResourceXM.json"],
+        "textures": ["./data/img/genericModTexture.png", "./data/img/objectXMTexture.png"],
+        "shaders": [
+            {
+                "vertex": "./shaders/textured.vert",
+                "fragment": "./shaders/textured.frag"
+            },
+            {
+                "vertex": "./shaders/xm.vert",
+                "fragment": "./shaders/xm.frag"
+            }
+        ]
+    },
+    "Multi-hack": {
+        "vertices": ["./data/json/multiHackResource.json", "./data/json/multiHackResourceXM.json"],
+        "textures": ["./data/img/genericModTexture.png", "./data/img/objectXMTexture.png"],
+        "shaders": [
+            {
+                "vertex": "./shaders/textured.vert",
+                "fragment": "./shaders/textured.frag"
+            },
+            {
+                "vertex": "./shaders/xm.vert",
+                "fragment": "./shaders/xm.frag"
+            }
+        ]
+    },
+    "Force Amp": {
+        "vertices": ["./data/json/forceAmpResource.json", "./data/json/forceAmpResourceXM.json"],
+        "textures": ["./data/img/genericModTexture.png", "./data/img/objectXMTexture.png"],
+        "shaders": [
+            {
+                "vertex": "./shaders/textured.vert",
+                "fragment": "./shaders/textured.frag"
+            },
+            {
+                "vertex": "./shaders/xm.vert",
+                "fragment": "./shaders/xm.frag"
+            }
+        ]
+    },
+    "Turret": {
+        "vertices": ["./data/json/turretResource.json", "./data/json/turretResourceXM.json"],
+        "textures": ["./data/img/genericModTexture.png", "./data/img/objectXMTexture.png"],
+        "shaders": [
+            {
+                "vertex": "./shaders/textured.vert",
+                "fragment": "./shaders/textured.frag"
+            },
+            {
+                "vertex": "./shaders/xm.vert",
+                "fragment": "./shaders/xm.frag"
+            }
+        ]
+    },
+    "Portal Key": {
+        "vertices": ["./data/json/portalKeyResourceUnit.json"],
+        "textures": ["./data/img/genericModTexture.png"],
+        "shaders": [
+            {
+                "vertex": "./shaders/textured.vert",
+                "fragment": "./shaders/textured.frag"
+            }
+        ]
+    },
+    "Power Cube": {
+        "vertices": ["./data/json/powerCubeResource.json", "./data/json/powerCubeResourceXM.json"],
+        "textures": ["./data/img/genericModTexture.png", "./data/img/objectXMTexture.png"],
+        "shaders": [
+            {
+                "vertex": "./shaders/textured.vert",
+                "fragment": "./shaders/textured.frag"
+            },
+            {
+                "vertex": "./shaders/xm.vert",
+                "fragment": "./shaders/xm.frag"
+            }
+        ]
+    },
+    "Resonator": {
+        "vertices": ["./data/json/texturedResonatorRing.json", "./data/json/texturedResonatorXM.json"],
+        "textures": ["./data/img/genericModTexture.png", "./data/img/objectXMTexture.png"],
+        "shaders": [
+            {
+                "vertex": "./shaders/textured.vert",
+                "fragment": "./shaders/textured.frag"
+            },
+            {
+                "vertex": "./shaders/xm.vert",
+                "fragment": "./shaders/xm.frag"
+            }
+        ]
+    },
+    "XMP Burster": {
+        "vertices": ["./data/json/xmp.json", "./data/json/xmpXM.json"],
+        "textures": ["./data/img/genericModTexture.png", "./data/img/objectXMTexture.png"],
+        "shaders": [
+            {
+                "vertex": "./shaders/textured.vert",
+                "fragment": "./shaders/textured.frag"
+            },
+            {
+                "vertex": "./shaders/xm.vert",
+                "fragment": "./shaders/xm.frag"
+            }
+        ]
+    },
+    "Ultra Strike": {
+        "vertices": ["./data/json/ultrastrike.json", "./data/json/ultrastrikeXM.json"],
+        "textures": ["./data/img/genericModTexture.png", "./data/img/objectXMTexture.png"],
+        "shaders": [
+            {
+                "vertex": "./shaders/textured.vert",
+                "fragment": "./shaders/textured.frag"
+            },
+            {
+                "vertex": "./shaders/xm.vert",
+                "fragment": "./shaders/xm.frag"
+            }
+        ]
+    },
+    "ADA Refactor": {
+        "vertices": ["./data/json/flipCardResourceAda.json", "./data/json/flipCardResourceXM.json"],
+        "textures": ["./data/img/genericModTexture.png", "./data/img/objectXMTexture.png"],
+        "shaders": [
+            {
+                "vertex": "./shaders/textured.vert",
+                "fragment": "./shaders/textured.frag"
+            },
+            {
+                "vertex": "./shaders/xm.vert",
+                "fragment": "./shaders/xm.frag"
+            }
+        ],
+        "extra": {
+            "team_color": [0.0, 0.5, 1.0, 1.0]
+        }
+    },
+    "JARVIS Virus": {
+        "vertices": ["./data/json/flipCardResourceJarvis.json", "./data/json/flipCardResourceXM.json"],
+        "textures": ["./data/img/genericModTexture.png", "./data/img/objectXMTexture.png"],
+        "shaders": [
+            {
+                "vertex": "./shaders/textured.vert",
+                "fragment": "./shaders/textured.frag"
+            },
+            {
+                "vertex": "./shaders/xm.vert",
+                "fragment": "./shaders/xm.frag"
+            }
+        ],
+        "extra": {
+            "team_color": [0.0, 0.8, 0.4, 1.0]
+        }
+    }
+};
 $(function () {
     var c = $("#canvas").css({
         width: "100%",
@@ -242,6 +445,4 @@ $(function () {
         });
         return false;
     });
-
-    $('a').get(3).click();
 });
