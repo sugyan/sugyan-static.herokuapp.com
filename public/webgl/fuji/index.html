@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title></title>
+    <script src="/js/lib/gl-matrix-min.js"></script>
+    <script src="./script.js"></script>
+    <script id="vs" type="x-shader/x-vertex">
+      attribute vec3 position;
+      attribute vec3 normal;
+      uniform   mat4 invMatrix;
+      uniform   mat4 mvMatrix;
+      uniform   mat4 pMatrix;
+      uniform   vec3 lightDir;
+      varying   vec4 vColor;
+
+      void main(void) {
+          vec3  invLight = normalize(invMatrix * vec4(lightDir, 0.0)).xyz;
+          float diffuse  = clamp(dot(normal, invLight), 0.3, 1.0);
+          vColor         = vec4(vec3(0.8), 1.0) * vec4(vec3(diffuse), 1.0);
+          gl_Position  = pMatrix * mvMatrix * vec4(position, 1.0);
+      }
+    </script>
+    <script id="fs" type="x-shader/x-fragment">
+      precision mediump float;
+      varying   vec4 vColor;
+
+      void main(void) {
+          gl_FragColor = vColor;
+      }
+    </script>
+  </head>
+  <body>
+    <canvas id="canvas"></canvas>
+    <p>
+      出典: <a href="http://cyberjapandata.gsi.go.jp/3d/" target="_blank">地理院地図3D</a>
+    </p>
+  </body>
+</html>
