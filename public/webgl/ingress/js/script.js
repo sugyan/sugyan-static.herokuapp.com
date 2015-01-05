@@ -432,7 +432,7 @@ $(function () {
     c.height = c.width * 3 / 4;
     var iiv = new IIV(c);
 
-    $('a[href=""]').click(function (e) {
+    $('.item').click(function (e) {
         var name = $(this).text();
         iiv.stop();
         $(".navbar li").removeClass("active");
@@ -443,6 +443,6 @@ $(function () {
         iiv.setup(name, function () {
             iiv.start();
         });
-        return false;
     });
+    $(window.location.hash).trigger('click');
 });
