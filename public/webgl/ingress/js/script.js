@@ -519,11 +519,13 @@ $(function () {
             });
             $(c).on('touchmove', function (e) {
                 if (touch) {
-                    var angle = baseAngle - ((startY - e.originalEvent.changedTouches[0].pageY) / 2.0 / 180.0 * Math.PI);
+                    var angle = baseAngle - ((startY - e.originalEvent.changedTouches[0].pageY) / 180.0 * Math.PI);
                     if (angle >  0.5 * Math.PI) { angle =  0.5 * Math.PI; }
                     if (angle < -0.5 * Math.PI) { angle = -0.5 * Math.PI; }
                     iiv.changeViewAngle(angle);
+                    return false;
                 }
+                return true;
             });
         }());
     } else {
