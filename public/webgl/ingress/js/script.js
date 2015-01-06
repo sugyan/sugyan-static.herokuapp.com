@@ -1,6 +1,7 @@
 var IIV = function (c) {
     this.c  = c;
     var gl = this.gl = c.getContext("webgl") || c.getContext("experimental-webgl");
+    gl.enable(gl.CULL_FACE);
     gl.depthFunc(gl.LEQUAL);
     gl.enable(gl.DEPTH_TEST);
 };
@@ -16,6 +17,7 @@ IIV.prototype.setup = function (name, callback) {
             return;
         };
         data.extra = resources["extra"];
+        data.color = resources["color"];
         self.data = data;
         callback();
     };
@@ -34,6 +36,7 @@ IIV.prototype.setup = function (name, callback) {
 };
 IIV.prototype.start = function () {
     var self = this;
+    self.changeColor();
 
     var start = new Date().getTime();
     (function () {
@@ -49,6 +52,10 @@ IIV.prototype.stop = function () {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 };
 IIV.prototype.draw = function (time) {
+    var color = this.colorData.rarity[1]; // default color
+    if (this.data.color) {
+        color = this.color[this.data.color];
+    }
     var gl = this.gl;
     var rad = time * (60 / 1000) / 180.0 * Math.PI;
 
@@ -79,6 +86,7 @@ IIV.prototype.draw = function (time) {
         gl.uniformMatrix4fv(gl.getUniformLocation(this.data["programs"][i], "u_mvMatrix"), false, mv_mat);
         gl.uniform1f(gl.getUniformLocation(this.data["programs"][i], "u_elapsedTime"), time / 6000);
         gl.uniform4fv(gl.getUniformLocation(this.data["programs"][i], "u_teamColor"), teamColor);
+        gl.uniform3fv(gl.getUniformLocation(this.data["programs"][i], "u_color"), color);
         // vbo
         vbuf = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, vbuf);
@@ -199,6 +207,33 @@ IIV.prototype.createPrograms = function (shaders) {
         return program;
     });
 };
+IIV.prototype.changeColor = function () {
+    this.color = {
+        "level": this.colorData["level"][Math.floor(Math.random() * 8)],
+        "rarity": this.colorData["rarity"][Math.floor(Math.random() * 3)],
+        "extra": this.colorData["extra"][0]
+    };
+};
+IIV.prototype.colorData = {
+    "level": [
+        [0.90, 0.90, 0.09],     // L1
+        [0.90, 0.63, 0.09],     // L2
+        [0.90, 0.36, 0.09],     // L3
+        [0.90, 0.09, 0.09],     // L4
+        [0.90, 0.09, 0.36],     // L5
+        [0.90, 0.09, 0.63],     // L6
+        [0.90, 0.09, 0.90],     // L7
+        [0.63, 0.09, 0.90]      // L8
+    ],
+    "rarity": [
+        [0.42, 0.90, 0.18],     // Common
+        [0.54, 0.18, 0.90],     // Rare
+        [0.90, 0.18, 0.90]      // Very Rare
+    ],
+    "extra": [
+        [0.90, 0.18, 0.90]      // Very Rare
+    ]
+};
 IIV.prototype.resourceData = {
     "Capsule": {
         "vertices": ["./data/json/capsuleResource.json", "./data/json/capsuleResourceXM.json"],
@@ -236,7 +271,8 @@ IIV.prototype.resourceData = {
                 "vertex": "./shaders/xm.vert",
                 "fragment": "./shaders/xm.frag"
             }
-        ]
+        ],
+        "color": "rarity"
     },
     "AXA Shield": {
         "vertices": ["./data/json/extra_shield.json", "./data/json/shieldResourceXM.json"],
@@ -250,7 +286,8 @@ IIV.prototype.resourceData = {
                 "vertex": "./shaders/xm.vert",
                 "fragment": "./shaders/xm.frag"
             }
-        ]
+        ],
+        "color": "extra"
     },
     "Link Amp": {
         "vertices": ["./data/json/linkAmpResource.json", "./data/json/linkAmpResourceXM.json"],
@@ -278,7 +315,8 @@ IIV.prototype.resourceData = {
                 "vertex": "./shaders/xm.vert",
                 "fragment": "./shaders/xm.frag"
             }
-        ]
+        ],
+        "color": "rarity"
     },
     "Multi-hack": {
         "vertices": ["./data/json/multiHackResource.json", "./data/json/multiHackResourceXM.json"],
@@ -292,7 +330,8 @@ IIV.prototype.resourceData = {
                 "vertex": "./shaders/xm.vert",
                 "fragment": "./shaders/xm.frag"
             }
-        ]
+        ],
+        "color": "rarity"
     },
     "Force Amp": {
         "vertices": ["./data/json/forceAmpResource.json", "./data/json/forceAmpResourceXM.json"],
@@ -344,7 +383,8 @@ IIV.prototype.resourceData = {
                 "vertex": "./shaders/xm.vert",
                 "fragment": "./shaders/xm.frag"
             }
-        ]
+        ],
+        "color": "level"
     },
     "Resonator": {
         "vertices": ["./data/json/texturedResonatorRing.json", "./data/json/texturedResonatorXM.json"],
@@ -358,7 +398,8 @@ IIV.prototype.resourceData = {
                 "vertex": "./shaders/xm.vert",
                 "fragment": "./shaders/xm.frag"
             }
-        ]
+        ],
+        "color": "level"
     },
     "XMP Burster": {
         "vertices": ["./data/json/xmp.json", "./data/json/xmpXM.json"],
@@ -372,7 +413,8 @@ IIV.prototype.resourceData = {
                 "vertex": "./shaders/xm.vert",
                 "fragment": "./shaders/xm.frag"
             }
-        ]
+        ],
+        "color": "level"
     },
     "Ultra Strike": {
         "vertices": ["./data/json/ultrastrike.json", "./data/json/ultrastrikeXM.json"],
@@ -386,7 +428,8 @@ IIV.prototype.resourceData = {
                 "vertex": "./shaders/xm.vert",
                 "fragment": "./shaders/xm.frag"
             }
-        ]
+        ],
+        "color": "level"
     },
     "ADA Refactor": {
         "vertices": ["./data/json/flipCardResourceAda.json", "./data/json/flipCardResourceXM.json"],
@@ -445,4 +488,8 @@ $(function () {
         });
     });
     $(window.location.hash).trigger('click');
+
+    $(c).click(function () {
+        iiv.changeColor();
+    });
 });
