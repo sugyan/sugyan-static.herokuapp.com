@@ -37,6 +37,8 @@ IIV.prototype.setup = function (name, callback) {
 IIV.prototype.start = function () {
     var self = this;
     self.changeColor();
+    self.changeViewAngle(Math.PI * 25.0 / 180.0);
+    self.changeSize(1.0);
 
     var start = new Date().getTime();
     (function () {
@@ -60,12 +62,16 @@ IIV.prototype.draw = function (time) {
     var rad = time * (60 / 1000) / 180.0 * Math.PI;
 
     var p_mat  = mat4.create();
-    var mv_mat = mat4.create();
-    mat4.perspective(p_mat, 45, this.c.width / this.c.height, 1, 10);
-    mat4.translate(p_mat, p_mat, [0.0, 0.0, -3.0]);
-    mat4.rotate(mv_mat, mv_mat, Math.PI * 25.0 / 180.0, [1.0, 0.0, 0.0]);
-    mat4.rotate(mv_mat, mv_mat, rad, [0.0, 1.0, 0.0]);
-    mat4.scale(mv_mat, mv_mat, [2.0, 2.0, 2.0]);
+    var v_mat  = mat4.create();
+    var m_mat  = mat4.create();
+    var mvp_mat = mat4.create();
+    mat4.perspective(p_mat, 45, this.c.width / this.c.height, 0.1, 10);
+    mat4.lookAt(v_mat, vec3.fromValues(0.0, 0.0, 2.0), vec3.fromValues(0.0, 0.0, 0.0), vec3.fromValues(0.0, 1.0, 0.0));
+    mat4.rotate(v_mat, v_mat, this.viewAngle, [1.0, 0.0, 0.0]);
+    mat4.rotate(m_mat, m_mat, rad, [0.0, 1.0, 0.0]);
+    mat4.scale(m_mat, m_mat, [this.size, this.size, this.size]);
+    mat4.multiply(mvp_mat, p_mat, v_mat);
+    mat4.multiply(mvp_mat, mvp_mat, m_mat);
 
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -83,7 +89,7 @@ IIV.prototype.draw = function (time) {
         // uniform
         gl.useProgram(this.data["programs"][i]);
         gl.uniformMatrix4fv(gl.getUniformLocation(this.data["programs"][i], "u_pMatrix"),  false, p_mat);
-        gl.uniformMatrix4fv(gl.getUniformLocation(this.data["programs"][i], "u_mvMatrix"), false, mv_mat);
+        gl.uniformMatrix4fv(gl.getUniformLocation(this.data["programs"][i], "u_mvpMatrix"), false, mvp_mat);
         gl.uniform1f(gl.getUniformLocation(this.data["programs"][i], "u_elapsedTime"), time / 6000);
         gl.uniform4fv(gl.getUniformLocation(this.data["programs"][i], "u_teamColor"), teamColor);
         gl.uniform3fv(gl.getUniformLocation(this.data["programs"][i], "u_color"), color);
@@ -213,6 +219,12 @@ IIV.prototype.changeColor = function () {
         "rarity": this.colorData["rarity"][Math.floor(Math.random() * 3)],
         "extra": this.colorData["extra"][0]
     };
+};
+IIV.prototype.changeViewAngle = function (rad) {
+    this.viewAngle = rad;
+};
+IIV.prototype.changeSize = function (size) {
+    this.size = size;
 };
 IIV.prototype.colorData = {
     "level": [
@@ -492,4 +504,41 @@ $(function () {
     $(c).click(function () {
         iiv.changeColor();
     });
+    if ('ontouchend' in document) {
+        (function () {
+            var touch = false;
+            var startY = 0;
+            var baseAngle = 0;
+            $(c).on('touchstart', function (e) {
+                touch = true;
+                startY = e.originalEvent.changedTouches[0].pageY;
+                baseAngle = iiv.viewAngle;
+            });
+            $(c).on('touchend', function (e) {
+                touch = false;
+            });
+            $(c).on('touchmove', function (e) {
+                if (touch) {
+                    var angle = baseAngle - ((startY - e.originalEvent.changedTouches[0].pageY) / 2.0 / 180.0 * Math.PI);
+                    if (angle >  0.5 * Math.PI) { angle =  0.5 * Math.PI; }
+                    if (angle < -0.5 * Math.PI) { angle = -0.5 * Math.PI; }
+                    iiv.changeViewAngle(angle);
+                }
+            });
+        }());
+    } else {
+        $(c).mousemove(function (e) {
+            var h = c.height / 2;
+            var y = e.clientY - c.offsetTop;
+            iiv.changeViewAngle((0.5 - y / h) * Math.PI);
+        });
+        $(c).mousewheel(function (e) {
+            var size = iiv.size;
+            size -= e.deltaY * e.deltaFactor * 0.01;
+            if (size < 0.5) { size = 0.5; }
+            if (size > 2.0) { size = 2.0; }
+            iiv.changeSize(size);
+            return false;
+        });
+    }
 });
