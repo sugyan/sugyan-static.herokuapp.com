@@ -37,8 +37,8 @@ IIV.prototype.setup = function (name, callback) {
 IIV.prototype.start = function () {
     var self = this;
     self.changeColor();
-    self.changeViewAngle(Math.PI * 25.0 / 180.0);
-    self.changeSize(1.0);
+    self.viewAngle = Math.PI * 25.0 / 180.0;
+    self.scale = 1.0;
 
     var start = new Date().getTime();
     (function () {
@@ -69,7 +69,7 @@ IIV.prototype.draw = function (time) {
     mat4.lookAt(v_mat, vec3.fromValues(0.0, 0.0, 2.0), vec3.fromValues(0.0, 0.0, 0.0), vec3.fromValues(0.0, 1.0, 0.0));
     mat4.rotate(v_mat, v_mat, this.viewAngle, [1.0, 0.0, 0.0]);
     mat4.rotate(m_mat, m_mat, rad, [0.0, 1.0, 0.0]);
-    mat4.scale(m_mat, m_mat, [this.size, this.size, this.size]);
+    mat4.scale(m_mat, m_mat, [this.scale, this.scale, this.scale]);
     mat4.multiply(mvp_mat, p_mat, v_mat);
     mat4.multiply(mvp_mat, mvp_mat, m_mat);
 
@@ -219,12 +219,6 @@ IIV.prototype.changeColor = function () {
         "rarity": this.colorData["rarity"][Math.floor(Math.random() * 3)],
         "extra": this.colorData["extra"][0]
     };
-};
-IIV.prototype.changeViewAngle = function (rad) {
-    this.viewAngle = rad;
-};
-IIV.prototype.changeSize = function (size) {
-    this.size = size;
 };
 IIV.prototype.colorData = {
     "level": [
@@ -506,23 +500,40 @@ $(function () {
     });
     if ('ontouchend' in document) {
         (function () {
-            var touch = false;
+            var scaling;
+            var startD = 0;
             var startY = 0;
             var baseAngle = 0;
+            var baseScale = 0;
             $(c).on('touchstart', function (e) {
-                touch = true;
                 startY = e.originalEvent.changedTouches[0].pageY;
                 baseAngle = iiv.viewAngle;
-            });
-            $(c).on('touchend', function (e) {
-                touch = false;
+                baseScale = iiv.scale;
+                if (e.originalEvent.touches.length > 1) {
+                    scaling = true;
+                    startD = Math.sqrt(
+                        (e.originalEvent.touches[0].x - e.originalEvent.touches[1].x) * (e.originalEvent.touches[0].x - e.originalEvent.touches[1].x) +
+                        (e.originalEvent.touches[0].y - e.originalEvent.touches[1].y) * (e.originalEvent.touches[0].y - e.originalEvent.touches[1].y)
+                    );
+                } else {
+                    scaling = false;
+                }
             });
             $(c).on('touchmove', function (e) {
-                if (touch) {
+                if (scaling) {
+                    var dist = Math.sqrt(
+                        (e.originalEvent.touches[0].x - e.originalEvent.touches[1].x) * (e.originalEvent.touches[0].x - e.originalEvent.touches[1].x) +
+                        (e.originalEvent.touches[0].y - e.originalEvent.touches[1].y) * (e.originalEvent.touches[0].y - e.originalEvent.touches[1].y)
+                    );
+                    var scale = baseScale + (dist - startD);
+                    if (scale < 0.5) { scale = 0.5; }
+                    if (scale > 2.0) { scale = 2.0; }
+                    iiv.scale = scale;
+                } else {
                     var angle = baseAngle - ((startY - e.originalEvent.changedTouches[0].pageY) / 180.0 * Math.PI);
                     if (angle >  0.5 * Math.PI) { angle =  0.5 * Math.PI; }
                     if (angle < -0.5 * Math.PI) { angle = -0.5 * Math.PI; }
-                    iiv.changeViewAngle(angle);
+                    iiv.viewAngle = angle;
                     return false;
                 }
                 return true;
@@ -532,14 +543,14 @@ $(function () {
         $(c).mousemove(function (e) {
             var h = c.height / 2;
             var y = e.clientY - c.offsetTop;
-            iiv.changeViewAngle((0.5 - y / h) * Math.PI);
+            iiv.viewAngle = (0.5 - y / h) * Math.PI;
         });
         $(c).mousewheel(function (e) {
-            var size = iiv.size;
-            size -= e.deltaY * e.deltaFactor * 0.01;
-            if (size < 0.5) { size = 0.5; }
-            if (size > 2.0) { size = 2.0; }
-            iiv.changeSize(size);
+            var scale = iiv.scale;
+            scale -= e.deltaY * e.deltaFactor * 0.01;
+            if (scale < 0.5) { scale = 0.5; }
+            if (scale > 2.0) { scale = 2.0; }
+            iiv.scale = scale;
             return false;
         });
     }
