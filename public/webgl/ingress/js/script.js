@@ -521,14 +521,19 @@ $(function () {
             });
             $(c).on('touchmove', function (e) {
                 if (scaling) {
-                    var dist = Math.sqrt(
-                        (e.originalEvent.touches[0].x - e.originalEvent.touches[1].x) * (e.originalEvent.touches[0].x - e.originalEvent.touches[1].x) +
-                        (e.originalEvent.touches[0].y - e.originalEvent.touches[1].y) * (e.originalEvent.touches[0].y - e.originalEvent.touches[1].y)
-                    );
-                    var scale = baseScale + (dist - startD);
-                    if (scale < 0.5) { scale = 0.5; }
-                    if (scale > 2.0) { scale = 2.0; }
-                    iiv.scale = scale;
+                    try {
+                        var dist = Math.sqrt(
+                            (e.originalEvent.touches[0].x - e.originalEvent.touches[1].x) * (e.originalEvent.touches[0].x - e.originalEvent.touches[1].x) +
+                                (e.originalEvent.touches[0].y - e.originalEvent.touches[1].y) * (e.originalEvent.touches[0].y - e.originalEvent.touches[1].y)
+                        );
+                        var scale = baseScale + (dist - startD);
+                        if (scale < 0.5) { scale = 0.5; }
+                        if (scale > 2.0) { scale = 2.0; }
+                        iiv.scale = scale;
+                    } catch (e) {
+                        alert(e);
+                    }
+                    return false;
                 } else {
                     var angle = baseAngle - ((startY - e.originalEvent.changedTouches[0].pageY) / 180.0 * Math.PI);
                     if (angle >  0.5 * Math.PI) { angle =  0.5 * Math.PI; }
