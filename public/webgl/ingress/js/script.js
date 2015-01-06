@@ -226,12 +226,12 @@ IIV.prototype.colorData = {
         [0.63, 0.09, 0.90]      // L8
     ],
     "rarity": [
-        [0.42, 0.90, 0.18],     // Common
-        [0.54, 0.18, 0.90],     // Rare
-        [0.90, 0.18, 0.90]      // Very Rare
+        [0.60, 1.00, 0.63],     // Common
+        [0.67, 0.60, 1.00],     // Rare
+        [1.00, 0.60, 1.00]      // Very Rare
     ],
     "extra": [
-        [0.90, 0.18, 0.90]      // Very Rare
+        [1.00, 0.60, 1.00]      // Very Rare
     ]
 };
 IIV.prototype.resourceData = {
