@@ -65,8 +65,8 @@ IIV.prototype.draw = function (time) {
     var v_mat  = mat4.create();
     var m_mat  = mat4.create();
     var mvp_mat = mat4.create();
-    mat4.perspective(p_mat, 45, this.c.width / this.c.height, 0.1, 10);
-    mat4.lookAt(v_mat, vec3.fromValues(0.0, 0.0, 2.0), vec3.fromValues(0.0, 0.0, 0.0), vec3.fromValues(0.0, 1.0, 0.0));
+    mat4.perspective(p_mat, 20 * Math.PI / 180.0, this.c.width / this.c.height, 3, 10);
+    mat4.lookAt(v_mat, vec3.fromValues(0.0, 0.0, 5.0), vec3.fromValues(0.0, 0.0, 0.0), vec3.fromValues(0.0, 1.0, 0.0));
     mat4.rotate(v_mat, v_mat, this.viewAngle, [1.0, 0.0, 0.0]);
     mat4.rotate(m_mat, m_mat, rad, [0.0, 1.0, 0.0]);
     mat4.scale(m_mat, m_mat, [this.scale, this.scale, this.scale]);
