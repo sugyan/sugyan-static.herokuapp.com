@@ -493,7 +493,15 @@ $(function () {
             iiv.start();
         });
     });
-    $(window.location.hash).trigger('click');
+
+    var hash = $(window.location.hash);
+    if (hash.length > 0) {
+        hash.trigger('click');
+    } else {
+        iiv.setup($('.item').get(Math.floor(Math.random() * $('.item').length)).text, function () {
+            iiv.start();
+        });
+    }
 
     $(c).click(function () {
         iiv.changeColor();
