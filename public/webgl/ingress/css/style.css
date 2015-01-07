@@ -8,3 +8,27 @@ body {
 .navbar-fixed-top .navbar-collapse, .navbar-fixed-bottom .navbar-collapse {
     max-height: none;
 }
+
+.footer {
+    float: right;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 25px;
+}
+
+.social {
+    overflow: hidden;
+}
+.social .facebook {
+    width: 70px;
+}
+.social .twitter {
+    width: 70px;
+}
+.social .gplus {
+    width: 50px;
+}
+.social li {
+    float: right;
+}
