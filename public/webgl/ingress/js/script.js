@@ -478,10 +478,10 @@ $(function () {
         height: "100%"
     }).get(0);
     c.width  = $(c).width() * 2;
-    c.height = c.width * 3 / 4;
+    c.height = Math.min(c.width * 3 / 4, $(window).height() - $(c).offset().top - 5) * 2;
     var iiv = new IIV(c);
 
-    $('.item').click(function (e) {
+    $(".item").click(function (e) {
         var name = $(this).text();
         iiv.stop();
         $(".navbar li").removeClass("active");
@@ -496,9 +496,9 @@ $(function () {
 
     var hash = $(window.location.hash);
     if (hash.length > 0) {
-        hash.trigger('click');
+        hash.trigger("click");
     } else {
-        iiv.setup($('.item').get(Math.floor(Math.random() * $('.item').length)).text, function () {
+        iiv.setup($(".item").get(Math.floor(Math.random() * $(".item").length)).text, function () {
             iiv.start();
         });
     }
@@ -506,14 +506,14 @@ $(function () {
     $(c).click(function () {
         iiv.changeColor();
     });
-    if ('ontouchend' in document) {
+    if ("ontouchend" in document) {
         (function () {
             var scaling;
             var startD = 0;
             var startY = 0;
             var baseAngle = 0;
             var baseScale = 0;
-            $(c).on('touchstart', function (e) {
+            $(c).on("touchstart", function (e) {
                 startY = e.originalEvent.changedTouches[0].pageY;
                 baseAngle = iiv.viewAngle;
                 baseScale = iiv.scale;
@@ -523,7 +523,7 @@ $(function () {
                     scaling = false;
                 }
             });
-            $(c).on('touchmove', function (e) {
+            $(c).on("touchmove", function (e) {
                 if (! scaling) {
                     var angle = baseAngle - ((startY - e.originalEvent.changedTouches[0].pageY) / 180.0 * Math.PI);
                     if (angle >  0.5 * Math.PI) { angle =  0.5 * Math.PI; }
@@ -533,7 +533,7 @@ $(function () {
                 }
                 return true;
             });
-            $(c).on('gesturechange', function (e) {
+            $(c).on("gesturechange", function (e) {
                 var scale = baseScale + e.originalEvent.scale - 1.0;
                 if (scale < 0.5) { scale = 0.5; }
                 if (scale > 2.0) { scale = 2.0; }

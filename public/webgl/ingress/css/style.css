@@ -14,11 +14,16 @@ body {
     position: absolute;
     bottom: 0;
     width: 100%;
-    height: 25px;
+    height: 30px;
 }
 
 .social {
     overflow: hidden;
+    margin-bottom: 0;
+}
+.social li {
+    float: right;
+    height: 25px  !important;
 }
 .social .facebook {
     width: 70px;
@@ -28,7 +33,4 @@ body {
 }
 .social .gplus {
     width: 50px;
-}
-.social li {
-    float: right;
 }
